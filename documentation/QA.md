@@ -164,4 +164,3 @@ Indicate a Pass/Fail if this was performed with no deviations or waivers:
 - [ ] **Final Result: Pass**
 
 * **Deviations / Waivers / Comments:**
-* **QA Procedure Git Commit:**

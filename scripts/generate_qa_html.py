@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # Convert clean documentation/QA.md into a simple interactive QA.html page.
 
-import argparse, html, pathlib, re, sys
+import argparse, html, os, pathlib, re, subprocess, sys
 
 TAG_RE = re.compile(r"<(?:/?[A-Za-z!][^>]*)>")
 HEAD_RE = re.compile(r"^(#{1,6})\s+(.+?)\s*$")
@@ -293,12 +293,25 @@ def convert_markdown(md_text: str) -> tuple[str, str]:
     return title, "\n".join(blocks)
 
 
+# Read the short Git commit hash for auto-populating QA metadata.
+def get_git_commit(cwd: pathlib.Path) -> str:
+    try:
+        out = subprocess.check_output(["git", "-c", "safe.directory=*", "-C", str(cwd), "rev-parse", "--short", "HEAD"], stderr=subprocess.DEVNULL, text=True).strip()
+        if out:
+            return out
+    except Exception:
+        pass
+    return os.environ.get("GITHUB_SHA", "")[:7] or "unknown"
+
+
 # Build the standalone QA.html document.
-def build_full_html(md_text: str, source_name: str = "QA.md") -> str:
+def build_full_html(md_text: str, source_name: str = "QA.md", git_commit: str = "unknown") -> str:
     validate_markdown(md_text, source_name=source_name)
     title, body = convert_markdown(md_text)
     body = body.replace("</h1>", f"</h1>\n{TOOLBAR_HTML}", 1) if "</h1>" in body else f"{TOOLBAR_HTML}\n{body}"
-    return f'<!DOCTYPE html>\n<html lang="en">\n<head>\n<meta charset="utf-8">\n<title>{html.escape(title)}</title>\n<style>{PAGE_CSS}</style>\n</head>\n<body>\n<form id="qa-form" onsubmit="return false;">\n{body}\n{TOOLBAR_HTML}\n</form>\n<script>{PAGE_JS}</script>\n</body>\n</html>\n'
+    esc_commit = html.escape(git_commit, True)
+    commit_html = f'<p><strong>QA Procedure Git Commit:</strong> <code>{esc_commit}</code><input type="hidden" value="{esc_commit}" data-csv-role="metadata" data-csv-header="QA Procedure Git Commit" data-csv-order="999999"></p>'
+    return f'<!DOCTYPE html>\n<html lang="en">\n<head>\n<meta charset="utf-8">\n<title>{html.escape(title)}</title>\n<style>{PAGE_CSS}</style>\n</head>\n<body>\n<form id="qa-form" onsubmit="return false;">\n{body}\n{commit_html}\n{TOOLBAR_HTML}\n</form>\n<script>{PAGE_JS}</script>\n</body>\n</html>\n'
 
 
 # Add a QA Procedure link to the #theSideNav sidebar in KiBot navigation pages.
@@ -333,8 +346,9 @@ def main(argv: list[str] | None = None) -> int:
         print(f"Error: Input file not found: {args.input}", file=sys.stderr)
         return 1
 
+    commit = get_git_commit(args.input.resolve().parent)
     try:
-        full_html = build_full_html(args.input.read_text(encoding="utf-8"), str(args.input))
+        full_html = build_full_html(args.input.read_text(encoding="utf-8"), str(args.input), commit)
     except ValueError as exc:
         print(f"Error: {exc}", file=sys.stderr)
         return 1
