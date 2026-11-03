@@ -25,4 +25,3 @@ This repository contains KiCad 9.0.4 design files.
 Revision 1.0 produced and tested.
 
 ![Image](images/trigger-output-fmc.jpg)
-"# trigger-output-fmc-QATEST2" 
