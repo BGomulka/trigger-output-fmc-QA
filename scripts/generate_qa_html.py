@@ -33,6 +33,11 @@ th { background: #eee; }
 textarea { width: 100%; box-sizing: border-box; margin-top: 4px; }
 td input[type="text"] { width: 95%; }
 .no-bullets { list-style: none; padding-left: 0; }
+.no-bullets li { display: flex; align-items: baseline; flex-wrap: wrap; margin-bottom: 6px; }
+.no-bullets li strong { margin-right: 6px; white-space: nowrap; }
+.no-bullets li input[type="text"] { flex: 1 1 200px; min-width: 150px; }
+.no-bullets li input[type="date"] { flex: 0 1 180px; }
+.no-bullets li textarea { width: 100%; }
 .toolbar { margin: 15px 0; padding: 8px; border: 1px solid #ccc; background: #f5f5f5; }
 .toolbar button, .toolbar label, .toolbar a { margin-right: 8px; }
 @media print {
@@ -40,8 +45,23 @@ td input[type="text"] { width: 95%; }
   body { max-width: 100%; margin: 0; padding: 0; font-size: 10.5pt; }
   h1, h2, h3 { page-break-after: avoid; break-after: avoid; }
   table, tr { page-break-inside: avoid; break-inside: avoid; }
-  input[type="text"], input[type="date"] { border: none; border-bottom: 1px solid #000; background: transparent; }
-  td input[type="text"] { border: none; }
+  input[type="text"], input[type="date"] {
+    border: none !important;
+    border-bottom: 1px solid #000 !important;
+    background: transparent !important;
+    width: auto !important;
+    max-width: 100% !important;
+    text-overflow: clip !important;
+  }
+  .no-bullets li input[type="text"] {
+    flex: 1 1 auto !important;
+    width: auto !important;
+  }
+  td input[type="text"] {
+    border: none !important;
+    border-bottom: none !important;
+    width: 95% !important;
+  }
 }
 """
 
