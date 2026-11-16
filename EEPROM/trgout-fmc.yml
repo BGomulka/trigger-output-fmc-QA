@@ -1,11 +1,11 @@
 # IPMI EEPROM
 
 BoardInfo:
-  mfg_date_time: '2026-08-25 09:00:00'
+  mfg_date_time: '2026-11-10 09:00:00'
   manufacturer: 'Osprey'
   product_name: 'TRG-OUT'
   serial_number: '001'
-  part_number: 'v1.0'
+  part_number: 'v1.1'
 
 MultirecordArea:
 - type: DCLoad
